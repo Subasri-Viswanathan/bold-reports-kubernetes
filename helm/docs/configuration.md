@@ -106,49 +106,6 @@ persistentVolume:
 
 > **NOTE:** The Azure storage account credentials will be maintained in a secret named `bold-azure-secret`
 
-2. On-Premise
-  
-```console
-clusterProvider: onpremise
-    
-persistentVolume:
-  onpremise:
-    hostPath: /run/desktop/mnt/host/<local_directory>
-```
-
-<br/>
-<table>
-    <tr>
-      <td>
-       <b>Name</b>
-      </td>
-      <td>
-       <b>Description</b>
-      </td>
-    </tr>
-    <tr>
-      <td>
-       clusterProvider
-      </td>
-      <td>
-       The type of kubernetes cluster provider you are using. In this case the clusterProvider value is <i>onpremise</i>
-      </td>
-    </tr>
-    <tr>
-      <td>
-       persistentVolume.onpremise.hostPath
-      </td>
-      <td>
-       The shared folder path in your host machine.<br/><br/>
-       Ex: Create a folder in your machine to store the shared folders for application usage.
-       <i>D://app/shared</i><br/><br/>
-       The corresponding value for the above shared folder will be,
-       <i>/run/desktop/mnt/host/d/app/shared</i>
-      </td>
-    </tr>
-</table>
-<br/>
-
 ## Load Balancing
 
 ### Ingress-Nginx

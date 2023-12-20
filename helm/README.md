@@ -26,7 +26,7 @@ helm repo update
 helm search repo boldreports
 
 NAME            CHART VERSION   APP VERSION     DESCRIPTION
-boldreports/boldreports   3.3.23           3.3.23          Make bolder business decisions with complete reporting solutions...
+boldreports/boldreports   5.3.8           5.3.8         Make bolder business decisions with complete reporting solutions...
 ```
 
 _See [helm repo](https://helm.sh/docs/helm/helm_repo/) for command documentation._
@@ -35,10 +35,8 @@ _See [helm repo](https://helm.sh/docs/helm/helm_repo/) for command documentation
 
 For Helm chart, you'll need to craft a `values.yaml`.
 
-* For `GKE` please download the values.yaml file [here](https://raw.githubusercontent.com/boldreports/bold-reports-kubernetes/v5.3.8/helm/custom-values/gke-values.yaml).
 * For `EKS` please download the values.yaml file [here](https://raw.githubusercontent.com/boldreports/bold-reports-kubernetes/v5.3.8/helm/custom-values/eks-values.yaml).
 * For `AKS` please download the values.yaml file [here](https://raw.githubusercontent.com/boldreports/bold-reports-kubernetes/v5.3.8/helm/custom-values/aks-values.yaml).
-* For `OnPremise` please download the values.yaml file [here](https://raw.githubusercontent.com/boldreports/bold-reports-kubernetes/v5.3.8/helm/custom-values/onpremise-values.yaml).
 
 <br/>
 
