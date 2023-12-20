@@ -19,14 +19,6 @@ By giving consent to install client libraries to connect with Oracle, PostgreSQL
 
 [MIT License](https://github.com/mysql-net/MySqlConnector/blob/master/LICENSE)
 
-
-## PhantomJS WebKit
-
-Please refer the phantomjs installation steps from the following link.
-    
-[Consent-to-deploy-phantomjs-webkit](../docs/install-opt-library.md)
-
-
 # Client library names as arguments for Bold Reports deployment in Kubernetes
 
 Find the names of client libraries, which needs to be passed as a comma separated string for an environment variable in **deployment.yaml** file.

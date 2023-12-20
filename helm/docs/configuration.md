@@ -180,7 +180,9 @@ You can change the affinityCookieExpiration time. The default value is 600s.
 
 ```console
 loadBalancer:
-  affinityCookieExpiration: 600
+  affinityCookie:
+    enable: true
+    affinityCookieExpiration: 600
 ```
 
 ### SSL Configuration
@@ -203,7 +205,7 @@ kubectl create secret tls bold-tls -n istio-system --key <key-path> --cert <cert
 
 You can map mutiple domains in both Ingress Nginx and Istio like below. While mapping multiple domains you have to include the `appBaseUrl` in any of the matching host array.
 
-FOr multiple domain scenerio the `singleHost` secret will not be considered, you have to mention your secret inside `multipleHost` section.
+For multiple domain scenerio the `singleHost` secret will not be considered, you have to mention your secret inside `multipleHost` section.
 
 `Ingress Nginx`
 
