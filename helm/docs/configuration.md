@@ -106,6 +106,45 @@ persistentVolume:
 
 > **NOTE:** The Azure storage account credentials will be maintained in a secret named `bold-azure-secret`
 
+2. EKS
+
+```console
+clusterProvider: eks
+    
+persistentVolume:
+  eks:
+    efsFileSystemId: <efs_file_system_id>
+```
+
+<br/>
+<table>
+    <tr>
+      <td>
+       <b>Name</b>
+      </td>
+      <td>
+       <b>Description</b>
+      </td>
+    </tr>
+    <tr>
+      <td>
+       clusterProvider
+      </td>
+      <td>
+       The type of kubernetes cluster provider you are using. In this case the clusterProvider value is <i>eks</i>
+      </td>
+    </tr>
+    <tr>
+      <td>
+       persistentVolume.eks.efsFileSystemId
+      </td>
+      <td>
+       The <i>File system ID</i> of your EFS file system.
+      </td>
+    </tr>
+</table>
+<br/>
+
 ## Load Balancing
 
 ### Ingress-Nginx
@@ -144,7 +183,7 @@ loadBalancer:
   affinityCookieExpiration: 600
 ```
 
-### SSL Termination
+### SSL Configuration
 
 If you have the SSL certificate for your DNS and need to configure the site with your SSL certificate, just pass your DNS with `https` protocol to `appBaseUrl`, by doing this it will automatically enable SSL in both Ingress and Istio.
 

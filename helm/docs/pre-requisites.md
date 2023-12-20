@@ -3,8 +3,7 @@
 ## File Storage
 
 * [Azure Kubernetes Service (AKS)](#aks-file-storage)
-* [On-premise](#on-premise-file-storage)
-
+* [Amazon Elastic Kubernetes Service (EKS)](#eks-file-storage)
 
 ### AKS File Storage
 
@@ -20,38 +19,38 @@ For encoding the values to base64 please run the following command in powershell
 
 ![File Share details](images/aks-file-storage.png)
 
-### On-Premise File Storage
+### EKS File Storage
 
-Create a folder in your machine to store the shared folders for application usage.
+1. Deploy the EFS CSI Driver to your cluster and create an Amazon Elastic File System (EFS) volume to store the shared folders for application usage by following the below link.
 
-Ex:  `D://app/shared`
+   https://docs.aws.amazon.com/eks/latest/userguide/efs-csi.html 
 
-Mention this location in install command as like below,
-	
-Ex:  `D://app/shared` -> `/run/desktop/mnt/host/d/app/shared`
+2. Note the **File system ID** after creating EFS file system.
 
+![AWS EFS](images/aws-efs.png)
 
 ## Create and connect a cluster
 
 * [Azure Kubernetes Service (AKS)](#aks-cluster)
-* [On-premise](#on-premise-cluster)
-
+* [Amazon Elastic Kubernetes Service (EKS)](#eks-cluster)
 
 ### AKS Cluster
 
 1. Create a Kubernetes cluster in Microsoft Azure Kubernetes Service (AKS) to deploy Bold Reports.
    https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough-portal
 
-2. Connect with your Microsoft AKS cluster.
-   https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough-portal#connect-to-the-cluster
+2. Connect to your Amazon EKS cluster.
+   https://aws.amazon.com/premiumsupport/knowledge-center/eks-cluster-connection/
 
-### On-Premise Cluster
+### EKS Cluster
 
-1. Create a Kubernetes onpremise cluster to deploy Bold Reports.
+1. Create an Amazon EKS cluster and [node group](https://docs.aws.amazon.com/eks/latest/userguide/eks-compute.html) to deploy Bold Reports.
 
-2. Follow the instructions to [Create an On-Premise cluster](https://kubernetes.io/docs/setup/).
+   https://docs.aws.amazon.com/eks/latest/userguide/getting-started.html 
 
-
+2. Connect to your Amazon EKS cluster.
+   https://aws.amazon.com/premiumsupport/knowledge-center/eks-cluster-connection/
+  
 ## Load Balancing
 
 Currently we have provided support for `Nginx` and `Istio` as Load Balancers in Bold Reports. By default Nginx is used as reverse proxy for Bold Reports.
@@ -80,10 +79,10 @@ If you need to configure Bold Reports with Ingress, [Install Nginx ingress contr
     </tr>
     <tr>
       <td>
-       OnPremise
+       EKS Cluster
       </td>
       <td>
-       kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.41.2/deploy/static/provider/cloud/deploy.yaml
+       kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/aws/deploy.yaml 
       </td>
     </tr>
 </table>
@@ -113,10 +112,10 @@ If you need to configure Bold Reports with Istio, [Install Istio ingress gateway
     </tr>
     <tr>
       <td>
-       OnPremise
+       EKS Cluster
       </td>
       <td>
-       https://istio.io/latest/docs/setup/platform-setup/docker/
+       https://aws.amazon.com/blogs/opensource/getting-started-istio-eks/
       </td>
     </tr>
 </table>
