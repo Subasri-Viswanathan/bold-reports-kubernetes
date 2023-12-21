@@ -39,31 +39,38 @@ spec:
             name: id-ums-service
             port:
               number: 6002
-      - path: /bi
+      - path: /reporting
         pathType: Prefix
         backend:
           service:
-            name: bi-web-service
+            name: reports-web-service
             port:
-              number: 6004
-      - path: /bi/api
+              number: 6550
+      - path: /reporting/api
         pathType: Prefix
         backend:
           service:
-            name: bi-api-service
+            name: reports-api-service
             port:
-              number: 6005
-      - path: /bi/jobs
+              number: 6551
+      - path: /reporting/jobs
         pathType: Prefix
         backend:
           service:
-            name: bi-jobs-service
+            name: reports-jobs-service
             port:
-              number: 6006
-      - path: /bi/designer
+              number: 6552
+      - path: /reporting/viewer
         pathType: Prefix
         backend:
           service:
-            name: bi-dataservice-service
+            name: reports-viewer-service
             port:
-              number: 6007
+              number: 6554
+      - path: /reporting/reportservice
+        pathType: Prefix
+        backend:
+          service:
+            name: reports-reportservice-service
+            port:
+              number: 6553

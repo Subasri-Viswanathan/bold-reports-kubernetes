@@ -29,7 +29,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
- name: bold-fileserver-claim
+ name: bold-services-fileserver-claim
  namespace: bold-services
 spec:
  accessModes:
@@ -47,7 +47,7 @@ metadata:
   namespace: bold-services
 type: Opaque
 stringData:
-  #  The Bold BI licnece key which you have purchesed.
+  #  The Bold Reports licnece key which you have purchesed.
   BOLD_SERVICES_UNLOCK_KEY: ""
 ---
 apiVersion: v1
@@ -70,7 +70,7 @@ metadata:
   namespace: bold-services
 type: Opaque
 stringData:
-  # Type of a database server can be used for configuring the Bold BI, for example, mssql, mysql, and postgresql.
+  # Type of a database server can be used for configuring the Bold Reports, for example, mssql, mysql, and postgresql.
   BOLD_SERVICES_DB_TYPE: ""
 
   # Name of the Database Server
@@ -84,7 +84,7 @@ stringData:
 
   # Username for the database server
   # Please refer to this documentation for information on the user's permissions.
-  # https://help.boldbi.com/embedded-bi/faq/what-are-the-database-permissions-required-to-set-up-bold-bi-embedded/
+  # https://help.boldreports.com/enterprise-reporting/administrator-guide/faq/what-are-the-database-permissions-required-to-set-up-bold-reports/
   BOLD_SERVICES_DB_USER: ""
 
   # The database user's password
@@ -107,15 +107,15 @@ stringData:
   # Note: A semicolon(;) should be used to separate multiple parameters.
   BOLD_SERVICES_DB_ADDITIONAL_PARAMETERS: ""
 ---
-apiVersion: v1
-kind: Secret
-metadata:
-  name: bold-secret
-  namespace: bold-services
-type: Opaque
-stringData:
-  widget_bing_map_enable_secret: ""
-  widget_bing_map_api_key_secret: ""
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: bold-secret
+#   namespace: bold-services
+# type: Opaque
+# stringData:
+#   widget_bing_map_enable_secret: ""
+#   widget_bing_map_api_key_secret: ""
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -195,7 +195,7 @@ spec:
     spec:
       containers:
       - name: id-web-container
-        image: gcr.io/boldbi-294612/bold-identity:6.18.11
+        image: gcr.io/boldreports/bold-identity:5.3.8
         ports:
         - containerPort: 80
         resources:
@@ -208,7 +208,7 @@ spec:
         - name: APP_BASE_URL
           value: <application_base_url>
         - name: INSTALL_OPTIONAL_LIBS
-          value: "mongodb,mysql,influxdb,snowflake,oracle,clickhouse,google"
+          value: <comma_separated_library_names>
         readinessProbe:
           httpGet:
             path: /health-check
@@ -218,12 +218,12 @@ spec:
         volumeMounts:
         - mountPath: /application/app_data
           name: id-web-volume
-        - mountPath: /application/idp/web/logs/k8s
+        - mountPath: /application/idp/web/logs
           name: log4net-config-volume
       volumes:
       - name: id-web-volume
         persistentVolumeClaim:
-          claimName: bold-fileserver-claim
+          claimName: bold-services-fileserver-claim
           readOnly: false
       - name: log4net-config-volume
         configMap:
@@ -254,7 +254,7 @@ spec:
           name: id-api-volume
       containers:
       - name: id-api-container
-        image: gcr.io/boldbi-294612/bold-identity-api:6.18.11
+        image: gcr.io/boldreports/bold-idp-api:5.3.8
         ports:
         - containerPort: 80
         resources:
@@ -273,12 +273,12 @@ spec:
         volumeMounts:
         - mountPath: /application/app_data
           name: id-api-volume
-        - mountPath: /application/idp/api/logs/k8s
+        - mountPath: /application/idp/api/logs
           name: log4net-config-volume
       volumes:
       - name: id-api-volume
         persistentVolumeClaim:
-          claimName: bold-fileserver-claim
+          claimName: bold-services-fileserver-claim
           readOnly: false
       - name: log4net-config-volume
         configMap:
@@ -309,7 +309,7 @@ spec:
           name: id-ums-volume
       containers:
       - name: id-ums-container
-        image: gcr.io/boldbi-294612/bold-ums:6.18.11
+        image: gcr.io/boldreports/bold-ums:5.3.8
         ports:
         - containerPort: 80
         resources:
@@ -338,12 +338,12 @@ spec:
         volumeMounts:
         - mountPath: /application/app_data
           name: id-ums-volume
-        - mountPath: /application/idp/ums/logs/k8s
+        - mountPath: /application/idp/ums/logs
           name: log4net-config-volume
       volumes:
       - name: id-ums-volume
         persistentVolumeClaim:
-          claimName: bold-fileserver-claim
+          claimName: bold-services-fileserver-claim
           readOnly: false
       - name: log4net-config-volume
         configMap:
@@ -352,17 +352,17 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bi-web-deployment
+  name: reports-web-deployment
   namespace: bold-services
 spec:
   selector:
     matchLabels:
-      app: bi-web
+      app: reports-web
   replicas: 1
   template:
     metadata:
       labels:
-        app: bi-web
+        app: reports-web
     spec:
       initContainers:
       - name: id-web-initialization
@@ -371,10 +371,10 @@ spec:
         args: ["if [ ! -f /application/app_data/configuration/config.xml ]; then echo waiting for id-web; sleep 5; else echo config.xml file exist; fi"]
         volumeMounts:
         - mountPath: /application/app_data
-          name: bi-web-volume
+          name: reports-web-volume
       containers:
-      - name: bi-web-container
-        image: gcr.io/boldbi-294612/boldbi-server:6.18.11
+      - name: reports-web-container
+        image: gcr.io/boldreports/boldreports-server:5.3.8
         ports:
         - containerPort: 80
         resources:
@@ -392,13 +392,13 @@ spec:
           periodSeconds: 10
         volumeMounts:
         - mountPath: /application/app_data
-          name: bi-web-volume
-        - mountPath: /application/bi/web/logs/k8s
+          name: reports-web-volume
+        - mountPath: /application/reports/web/logs
           name: log4net-config-volume
       volumes:
-      - name: bi-web-volume
+      - name: reports-web-volume
         persistentVolumeClaim:
-          claimName: bold-fileserver-claim
+          claimName: bold-services-fileserver-claim
           readOnly: false
       - name: log4net-config-volume
         configMap:
@@ -407,17 +407,17 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bi-api-deployment
+  name: reports-api-deployment
   namespace: bold-services
 spec:
   selector:
     matchLabels:
-      app: bi-api
+      app: reports-api
   replicas: 1
   template:
     metadata:
       labels:
-        app: bi-api
+        app: reports-api
     spec:
       initContainers:
       - name: id-web-initialization
@@ -426,10 +426,10 @@ spec:
         args: ["if [ ! -f /application/app_data/configuration/config.xml ]; then echo waiting for id-web; sleep 5; else echo config.xml file exist; fi"]
         volumeMounts:
         - mountPath: /application/app_data
-          name: bi-api-volume
+          name: reports-api-volume
       containers:
-      - name: bi-api-container
-        image: gcr.io/boldbi-294612/boldbi-server-api:6.18.11
+      - name: reports-api-container
+        image: gcr.io/boldreports/boldreports-server-api:5.3.8
         ports:
         - containerPort: 80
         resources:
@@ -447,13 +447,13 @@ spec:
           periodSeconds: 10
         volumeMounts:
         - mountPath: /application/app_data
-          name: bi-api-volume
-        - mountPath: /application/bi/api/logs/k8s
+          name: reports-api-volume
+        - mountPath: /application/reports/api/logs
           name: log4net-config-volume
       volumes:
-      - name: bi-api-volume
+      - name: reports-api-volume
         persistentVolumeClaim:
-          claimName: bold-fileserver-claim
+          claimName: bold-services-fileserver-claim
           readOnly: false
       - name: log4net-config-volume
         configMap:
@@ -462,17 +462,17 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bi-jobs-deployment
+  name: reports-jobs-deployment
   namespace: bold-services
 spec:
   selector:
     matchLabels:
-      app: bi-jobs
+      app: reports-jobs
   replicas: 1
   template:
     metadata:
       labels:
-        app: bi-jobs
+        app: reports-jobs
     spec:
       initContainers:
       - name: id-web-initialization
@@ -481,10 +481,10 @@ spec:
         args: ["if [ ! -f /application/app_data/configuration/config.xml ]; then echo waiting for id-web; sleep 5; else echo config.xml file exist; fi"]
         volumeMounts:
         - mountPath: /application/app_data
-          name: bi-jobs-volume
+          name: reports-jobs-volume
       containers:
-      - name: bi-jobs-container
-        image: gcr.io/boldbi-294612/boldbi-server-jobs:6.18.11
+      - name: reports-jobs-container
+        image: gcr.io/boldreports/boldreports-server-jobs:5.3.8
         ports:
         - containerPort: 80
         resources:
@@ -502,13 +502,13 @@ spec:
           periodSeconds: 10
         volumeMounts:
         - mountPath: /application/app_data
-          name: bi-jobs-volume
-        - mountPath: /application/bi/jobs/logs/k8s
+          name: reports-jobs-volume
+        - mountPath: /application/reports/jobs/logs
           name: log4net-config-volume
       volumes:
-      - name: bi-jobs-volume
+      - name: reports-jobs-volume
         persistentVolumeClaim:
-          claimName: bold-fileserver-claim
+          claimName: bold-services-fileserver-claim
           readOnly: false
       - name: log4net-config-volume
         configMap:
@@ -517,17 +517,17 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bi-dataservice-deployment
+  name: reports-viewer-deployment
   namespace: bold-services
 spec:
   selector:
     matchLabels:
-      app: bi-dataservice
+      app: reports-viewer
   replicas: 1
   template:
     metadata:
       labels:
-        app: bi-dataservice
+        app: reports-viewer
     spec:
       initContainers:
       - name: id-web-initialization
@@ -536,10 +536,65 @@ spec:
         args: ["if [ ! -f /application/app_data/configuration/config.xml ]; then echo waiting for id-web; sleep 5; else echo config.xml file exist; fi"]
         volumeMounts:
         - mountPath: /application/app_data
-          name: bi-dataservice-volume
+          name: reports-jobs-volume
       containers:
-      - name: bi-dataservice-container
-        image: gcr.io/boldbi-294612/boldbi-designer:6.18.11
+      - name: reports-viewer-container
+        image: gcr.io/boldreports/boldreports-viewer:5.3.8
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 250m
+            memory: 750Mi
+        env:
+        - name: BOLD_SERVICES_HOSTING_ENVIRONMENT
+          value: k8s
+        readinessProbe:
+          httpGet:
+            path: /health-check
+            port: 80
+          initialDelaySeconds: 20
+          periodSeconds: 10
+        volumeMounts:
+        - mountPath: /application/app_data
+          name: reports-viewer-volume
+        - mountPath: /application/reports/jobs/logs
+          name: log4net-config-volume
+      volumes:
+      - name: reports-viewer-volume
+        persistentVolumeClaim:
+          claimName: bold-services-fileserver-claim
+          readOnly: false
+      - name: log4net-config-volume
+        configMap:
+          name: log4net-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reports-reportservice-deployment
+  namespace: bold-services
+spec:
+  selector:
+    matchLabels:
+      app: reports-reportservice
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: reports-reportservice
+    spec:
+      initContainers:
+      - name: id-web-initialization
+        image: busybox:1.28
+        command: ["/bin/sh","-c"]
+        args: ["if [ ! -f /application/app_data/configuration/config.xml ]; then echo waiting for id-web; sleep 5; else echo config.xml file exist; fi"]
+        volumeMounts:
+        - mountPath: /application/app_data
+          name: reports-reportservice-volume
+      containers:
+      - name: reports-reportservice-container
+        image: gcr.io/boldreports/boldreports-designer:6.18.11
         ports:
         - containerPort: 80
         env:
@@ -569,13 +624,13 @@ spec:
           periodSeconds: 10
         volumeMounts:
         - mountPath: /application/app_data
-          name: bi-dataservice-volume
-        - mountPath: /application/bi/dataservice/logs/k8s
+          name: reports-reportservice-volume
+        - mountPath: /application/reports/reportservice/logs/k8s
           name: log4net-config-volume
       volumes:
-      - name: bi-dataservice-volume
+      - name: reports-reportservice-volume
         persistentVolumeClaim:
-          claimName: bold-fileserver-claim
+          claimName: bold-services-fileserver-claim
           readOnly: false
       - name: log4net-config-volume
         configMap:
@@ -635,70 +690,87 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: bi-web-service
+  name: reports-web-service
   namespace: bold-services
   labels:
-    app: bi-web
+    app: reports-web
 spec:
   type: NodePort
   ports:
-  - name: bi-web-port
+  - name: reports-web-port
     port: 6004
     targetPort: 80
     protocol: TCP
   selector:
-    app: bi-web
+    app: reports-web
 --- 
 apiVersion: v1
 kind: Service
 metadata:
-  name: bi-api-service
+  name: reports-api-service
   namespace: bold-services
   labels:
-    app: bi-api
+    app: reports-api
 spec:
   type: NodePort
   ports:
-  - name: bi-api-port
+  - name: reports-api-port
     port: 6005
     targetPort: 80
     protocol: TCP
   selector:
-    app: bi-api
+    app: reports-api
 --- 
 apiVersion: v1
 kind: Service
 metadata:
-  name: bi-jobs-service
+  name: reports-jobs-service
   namespace: bold-services
   labels:
-    app: bi-jobs
+    app: reports-jobs
 spec:
   type: NodePort
   ports:
-  - name: bi-jobs-port
+  - name: reports-jobs-port
     port: 6006
     targetPort: 80
     protocol: TCP
   selector:
-    app: bi-jobs
+    app: reports-jobs
 --- 
 apiVersion: v1
 kind: Service
 metadata:
-  name: bi-dataservice-service
+  name: reports-viewer-service
   namespace: bold-services  
   labels:
-    app: bi-dataservice
+    app: reports-reportservice
 spec:
   type: NodePort
   ports:
-  - name: bi-dataservice-port
+  - name: reports-viewer-port
     port: 6007
     targetPort: 80
     protocol: TCP
   selector:
-    app: bi-dataservice
+    app: reports-viewer
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: reports-reportservice-service
+  namespace: bold-services  
+  labels:
+    app: reports-reportservice
+spec:
+  type: NodePort
+  ports:
+  - name: reports-reportservice-port
+    port: 6007
+    targetPort: 80
+    protocol: TCP
+  selector:
+    app: reports-reportservice
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -811,13 +883,13 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: bi-web-hpa
+  name: reports-web-hpa
   namespace: bold-services
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: bi-web-deployment
+    name: reports-web-deployment
   minReplicas: 1
   maxReplicas: 20
   metrics:
@@ -847,13 +919,85 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: bi-api-hpa
+  name: reports-api-hpa
   namespace: bold-services
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: bi-api-deployment
+    name: reports-api-deployment
+  minReplicas: 1
+  maxReplicas: 20
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleDown:
+      stareportslizationWindowSeconds: 60
+      policies:
+      - type: Pods
+        value: 1
+        periodSeconds: 60
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: reports-jobs-hpa
+  namespace: bold-services
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: reports-jobs-deployment
+  minReplicas: 1
+  maxReplicas: 20
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleDown:
+      stareportslizationWindowSeconds: 60
+      policies:
+      - type: Pods
+        value: 1
+        periodSeconds: 60
+      - type: Percent
+        value: 10
+        periodSeconds: 60   
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: reports-viewer-hpa
+  namespace: bold-services
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: reports-viewer-deployment
   minReplicas: 1
   maxReplicas: 20
   metrics:
@@ -883,13 +1027,13 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: bi-jobs-hpa
+  name: reports-reportservice-hpa
   namespace: bold-services
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: bi-jobs-deployment
+    name: reports-reportservice-deployment
   minReplicas: 1
   maxReplicas: 20
   metrics:
@@ -915,40 +1059,3 @@ spec:
       - type: Percent
         value: 10
         periodSeconds: 60
----
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: bi-dataservice-hpa
-  namespace: bold-services
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: bi-dataservice-deployment
-  minReplicas: 1
-  maxReplicas: 20
-  metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 80
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 80
-  behavior:
-    scaleDown:
-      stabilizationWindowSeconds: 60
-      policies:
-      - type: Pods
-        value: 1
-        periodSeconds: 60
-      - type: Percent
-        value: 10
-        periodSeconds: 60
-              
