@@ -536,7 +536,7 @@ spec:
         args: ["if [ ! -f /application/app_data/configuration/config.xml ]; then echo waiting for id-web; sleep 5; else echo config.xml file exist; fi"]
         volumeMounts:
         - mountPath: /application/app_data
-          name: reports-jobs-volume
+          name: reports-viewer-volume
       containers:
       - name: reports-viewer-container
         image: gcr.io/boldreports/boldreports-viewer:5.3.8
@@ -594,20 +594,10 @@ spec:
           name: reports-reportservice-volume
       containers:
       - name: reports-reportservice-container
-        image: gcr.io/boldreports/boldreports-designer:6.18.11
+        image: gcr.io/boldreports/boldreports-designer:5.3.8
         ports:
         - containerPort: 80
         env:
-        - name: widget_bing_map_enable
-          valueFrom:
-            secretKeyRef:
-              name: bold-secret
-              key: widget_bing_map_enable_secret
-        - name: widget_bing_map_api_key
-          valueFrom:
-            secretKeyRef:
-              name: bold-secret
-              key: widget_bing_map_api_key_secret
         - name: BOLD_SERVICES_HOSTING_ENVIRONMENT
           value: k8s
         - name: AppSettings__locale-path
@@ -625,7 +615,7 @@ spec:
         volumeMounts:
         - mountPath: /application/app_data
           name: reports-reportservice-volume
-        - mountPath: /application/reports/reportservice/logs/k8s
+        - mountPath: /application/reports/reportservice/logs
           name: log4net-config-volume
       volumes:
       - name: reports-reportservice-volume
@@ -698,7 +688,7 @@ spec:
   type: NodePort
   ports:
   - name: reports-web-port
-    port: 6004
+    port: 6550
     targetPort: 80
     protocol: TCP
   selector:
@@ -715,7 +705,7 @@ spec:
   type: NodePort
   ports:
   - name: reports-api-port
-    port: 6005
+    port: 6551
     targetPort: 80
     protocol: TCP
   selector:
@@ -732,7 +722,7 @@ spec:
   type: NodePort
   ports:
   - name: reports-jobs-port
-    port: 6006
+    port: 6552
     targetPort: 80
     protocol: TCP
   selector:
@@ -744,12 +734,12 @@ metadata:
   name: reports-viewer-service
   namespace: bold-services  
   labels:
-    app: reports-reportservice
+    app: reports-viewer
 spec:
   type: NodePort
   ports:
   - name: reports-viewer-port
-    port: 6007
+    port: 6554
     targetPort: 80
     protocol: TCP
   selector:
@@ -766,7 +756,7 @@ spec:
   type: NodePort
   ports:
   - name: reports-reportservice-port
-    port: 6007
+    port: 6553
     targetPort: 80
     protocol: TCP
   selector:
